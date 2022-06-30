@@ -52,11 +52,12 @@ public class LoginTests {
         } catch (NoAlertPresentException e){
             String actualTitle = driver.getTitle();
             Assert.assertEquals(actualTitle, HomePage.Title);
+            HomePage homePage = new HomePage(driver);
+            String actualWelcomeText = homePage.getWelcomeText();
+            String expectedWelcomeText = "Manger Id : " + userId;
+            Assert.assertEquals(actualWelcomeText,expectedWelcomeText);
         }
     }
-
-    //TODO: 2 TESTS UNO PARA LOGINSUCCESFUL Y OTRO PARA LOGINFAIL
-    //TODO: SUBIR ESTE A UN GITHUB. NOMBRE DEL REPO: BANK AUTOMATION
 
     @Test
     public void verifyLoginsuccesful() {
