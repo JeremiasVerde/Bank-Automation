@@ -6,6 +6,7 @@ import org.openqa.selenium.WebElement;
 
 public class LoginPage {
     WebDriver driver;
+    public static final String LOGIN_ERROR="User or Password is not valid";
 
     //locators
     By loginButton = By.name("btnLogin");

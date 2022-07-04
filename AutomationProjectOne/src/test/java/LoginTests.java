@@ -48,7 +48,7 @@ public class LoginTests {
             Alert alert = driver.switchTo().alert();
             String popText = alert.getText();
             alert.accept();
-            Assert.assertEquals(popText,Util.LOGIN_ERROR);
+            Assert.assertEquals(popText,LoginPage.LOGIN_ERROR);
         } catch (NoAlertPresentException e){
             String actualTitle = driver.getTitle();
             Assert.assertEquals(actualTitle, HomePage.Title);
@@ -56,16 +56,25 @@ public class LoginTests {
             String actualWelcomeText = homePage.getWelcomeText();
             String expectedWelcomeText = "Manger Id : " + userId;
             Assert.assertEquals(actualWelcomeText,expectedWelcomeText);
+            String actualBankName = homePage.getTitleBank();
+            String expectedBankName = HomePage.BANK_TITLE;
+            Assert.assertEquals(actualBankName,expectedBankName);
         }
     }
 
+    //TODO:Verificar para loginsuceesful aparezca: guru99bank
+
     @Test
     public void verifyLoginsuccesful() {
+        HomePage homePage = new HomePage(driver);
         loginPage.enterUserId(Util.USER_ID);
         loginPage.enterPassword(Util.PASSWORD);
         loginPage.clickLoginButton();
         String actualTitle = driver.getTitle();
         Assert.assertEquals(actualTitle, HomePage.Title);
+        String actualBankName = homePage.getTitleBank();
+        String expectedBankName = HomePage.BANK_TITLE;
+        Assert.assertEquals(actualBankName,expectedBankName);
     }
 
     @DataProvider(name="LoginProviderFail")
@@ -85,7 +94,7 @@ public class LoginTests {
         Alert alert = driver.switchTo().alert();
         String popText = alert.getText();
         alert.accept();
-        Assert.assertEquals(popText,Util.LOGIN_ERROR);
+        Assert.assertEquals(popText,LoginPage.LOGIN_ERROR);
     }
 
     @AfterTest
