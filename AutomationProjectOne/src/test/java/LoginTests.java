@@ -13,7 +13,6 @@ import java.time.Duration;
 
 public class LoginTests {
     public WebDriver driver ;
-    private LoginPage loginPage;
 
     //method
     @BeforeTest
@@ -21,7 +20,6 @@ public class LoginTests {
         FirefoxDriverManager.getInstance(DriverManagerType.FIREFOX).setup();
         driver = new FirefoxDriver();
         driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(Util.TIMEOUT));
-        loginPage = new LoginPage(driver);
     }
 
     @BeforeMethod
@@ -39,11 +37,16 @@ public class LoginTests {
         };
     }
 
-    @Test(dataProvider = "LoginProvider")
-    public void verifyLogin(String userId, String password) {
+    public void enterCredentials(String userId, String password, WebDriver driver){
+        LoginPage loginPage = new LoginPage(driver);
         loginPage.enterUserId(userId);
         loginPage.enterPassword(password);
         loginPage.clickLoginButton();
+    }
+
+    @Test(dataProvider = "LoginProvider")
+    public void testLogin(String userId, String password) {
+        enterCredentials(userId, password,driver);
         try{
             Alert alert = driver.switchTo().alert();
             String popText = alert.getText();
@@ -62,14 +65,10 @@ public class LoginTests {
         }
     }
 
-    //TODO:Verificar para loginsuceesful aparezca: guru99bank
-
     @Test
-    public void verifyLoginsuccesful() {
+    public void testLoginsuccesful() {
         HomePage homePage = new HomePage(driver);
-        loginPage.enterUserId(Util.USER_ID);
-        loginPage.enterPassword(Util.PASSWORD);
-        loginPage.clickLoginButton();
+        enterCredentials(Util.USER_ID,Util.PASSWORD,driver);
         String actualTitle = driver.getTitle();
         Assert.assertEquals(actualTitle, HomePage.Title);
         String actualBankName = homePage.getTitleBank();
@@ -87,10 +86,8 @@ public class LoginTests {
     }
 
     @Test(dataProvider = "LoginProviderFail")
-    public void verifyLoginFail(String userId, String password) {
-        loginPage.enterUserId(userId);
-        loginPage.enterPassword(password);
-        loginPage.clickLoginButton();
+    public void testLoginFail(String userId, String password) {
+        enterCredentials(userId, password,driver);
         Alert alert = driver.switchTo().alert();
         String popText = alert.getText();
         alert.accept();
