@@ -1,10 +1,10 @@
 import io.github.bonigarcia.wdm.config.DriverManagerType;
-import io.github.bonigarcia.wdm.managers.ChromeDriverManager;
 import io.github.bonigarcia.wdm.managers.FirefoxDriverManager;
+import org.openqa.selenium.Alert;
 import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.chrome.ChromeDriver;
-import org.openqa.selenium.chrome.ChromeOptions;
 import org.openqa.selenium.firefox.FirefoxDriver;
+import org.openqa.selenium.support.ui.ExpectedConditions;
+import org.openqa.selenium.support.ui.WebDriverWait;
 import org.testng.Assert;
 import org.testng.annotations.AfterTest;
 import org.testng.annotations.BeforeMethod;
@@ -13,20 +13,22 @@ import org.testng.annotations.Test;
 import page_objects.PasswordPage;
 
 import java.time.Duration;
-import java.util.Arrays;
+
 
 public class PasswordTests {
 
     public WebDriver driver;
 
+    public void verifyCurrentUrl(){
+        String actualURL = driver.getCurrentUrl();
+        String ExpectedURL = Util.BASE_URL + "manager/PasswordInput.php";
+        Assert.assertEquals(actualURL,ExpectedURL);
+    }
+
     @BeforeTest
     public void setUp(){
-        //FirefoxDriverManager.getInstance(DriverManagerType.FIREFOX).setup();
-        //driver = new FirefoxDriver();
-        ChromeDriverManager.getInstance(DriverManagerType.CHROME).setup();
-        ChromeOptions opt = new ChromeOptions();
-        opt.setExperimentalOption("excludeSwitches", Arrays.asList("disable-popup-blocking"));
-        driver = new ChromeDriver(opt);
+        FirefoxDriverManager.getInstance(DriverManagerType.FIREFOX).setup();
+        driver = new FirefoxDriver();
         driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(Util.TIMEOUT));
         driver.get(Util.BASE_URL);
     }
@@ -38,12 +40,21 @@ public class PasswordTests {
     }
 
     @Test
-    public void testURL(){
+    public void testWrongOldPassword(){
         PasswordPage passwordPage = new PasswordPage(driver);
         passwordPage.clickChancePasswordButton();
-        String actualURL = driver.getCurrentUrl();
-        String ExpectiveURL = Util.BASE_URL + "manager/PasswordInput.php";
-        Assert.assertEquals(actualURL,ExpectiveURL);
+        verifyCurrentUrl();
+        passwordPage.enterOldPassword(PasswordPage.OLD_PASSWORD);
+        passwordPage.enterNewPassword(PasswordPage.NEW_PASSWORD);
+        passwordPage.enterConfirmPassword(PasswordPage.NEW_PASSWORD);
+        passwordPage.clickSubmit();
+        Alert alert = driver.switchTo().alert();
+        String popText = alert.getText();
+        alert.accept();
+        Assert.assertEquals(popText, PasswordPage.CHANGE_PASSWORD_ERROR);
+        WebDriverWait wait = new WebDriverWait(driver,Duration.ofSeconds(Util.TIMEOUT));
+        wait.until(ExpectedConditions.urlContains("PasswordInput.php"));
+        verifyCurrentUrl();
     }
 
     @AfterTest
